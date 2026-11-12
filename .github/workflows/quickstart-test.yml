@@ -1,0 +1,23 @@
+name: quickstart-test
+on:
+  push:
+    branches: [quickstart-vm-test]
+  workflow_dispatch:
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        scenario: [clean, preexisting]
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: QuickStart end-to-end (${{ matrix.scenario }})
+        shell: powershell
+        run: .\.github\quickstart-test\Test-QuickStart.ps1 -Scenario ${{ matrix.scenario }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: results-${{ matrix.scenario }}
+          path: results-*.json
